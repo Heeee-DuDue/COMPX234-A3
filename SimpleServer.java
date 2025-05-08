@@ -1,36 +1,42 @@
 import java.io.*;
 import java.net.*;
 
-class HelloWorldServer
+class SimpleServer
 {
 
-    public static void main(String[] args) {
-        try {
-             /* listen on port 51234 for incoming connections */
-             ServerSocket ss = new ServerSocket(51234);
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(51234);
+        System.out.println("Server started on port 51234");
+        // Continuously accepting client connections
+        while (true) {
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("New client connected: " + clientSocket);
 
-             /* loop around, accepting new connections as they arrive */
-             while (true) {
-                 Socket s = ss.accept();
-                 BufferedReader read = 
-                     new BufferedReader(new InputStreamReader(s.getInputStream()));
-                 PrintWriter write = 
-                     new PrintWriter(s.getOutputStream(), true);
-
-                 /* read a line of text, and then echo it back */
-                 String in = read.readLine();
-                 write.println("You said: " + in);
-                 s.close();/* close the socket */
-            }
-       }
-       catch(exception e) {
-           System.err.println(e);
-       }
+            // Create a new thread for each client
+            new Thread(() -> {
+                try (
+                    BufferedReader in = new BufferedReader(
+                        new InputStreamReader(clientSocket.getInputStream())
+                    );
+                    PrintWriter out = new PrintWriter(
+                        clientSocket.getOutputStream(), true
+                    )
+                ) {
+                    String request;
+                    while ((request = in.readLine()) != null) {
+                        // Simple processing request: return the client message as is
+                        out.println("Server Response: " + request);
+                    }
+                } catch (IOException e) {
+                    System.err.println("Client error: " + e);
+                } finally {
+                    try {
+                        clientSocket.close();
+                    } catch(IOException e) {
+                        System.err.printlnq("Failed to close socket: " + e);
+                    }
+                }
+            }).start();
+        }
     }
 }
-
-
- 
-
-
-        
