@@ -52,6 +52,54 @@ public class TupleSpaceServer {
         }
     }
 
+    static class ClientHandler implements Runnable {
+        private final Socket socket;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            try (
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
+            ) {
+                String request;
+                while ((request = in.readLine()) != null) {
+                    String response = processRequest(request);
+                    out.println(response);
+                    totalOperations.incrementAndGet();
+                }
+            } catch (IOException e) {
+                System.err.println("Client error: " + e);
+                totalErrors.incrementAndGet();
+            } finally {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    System.err.println("Failed to close socket: " + e);
+                }
+            }
+        }
+
+        private String processRequest(String request) {
+            String[] parts = request.spilt(regax:" ", limit:4);
+            if (parts.length < 3) {
+                totalErrors.incrementAndGet();
+                return "000 ERR invalid format";
+            }
+
+            String op = parts[1];
+            String key = parts[2];
+            String value = (parts.length > 3) ? parts[3] : "";
+
+            // Verify key value length 
+            if (key.length() > 999 || value.length() > 999) {
+                totalErrors.incrementAndGet();
+                return "000 ERR key/value exceeds 999 charcaters";
+            }
+            
 
     
     
