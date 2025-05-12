@@ -60,7 +60,13 @@ public class TupleSpaceClient {
                 String response = in.readline();
                 System.out.println(line + ": " + response);
             }
-        } catch 
+        } catch (ConnectException e) {
+            System.err.println("Failed to connect to server:" + e.getMassage());
+        } catch (FileNotFoundException e) {
+            System.err.println("Request file not found: " + requestFile);
+        } catch (IOException e) {
+            System.err.println("IO Exception: " + e);
+            
 
 
                 
