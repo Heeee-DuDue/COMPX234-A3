@@ -66,6 +66,7 @@ public class TupleSpaceClient {
             System.err.println("Request file not found: " + requestFile);
         } catch (IOException e) {
             System.err.println("IO Exception: " + e);
+        }
             
 
 
