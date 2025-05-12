@@ -99,7 +99,46 @@ public class TupleSpaceServer {
                 totalErrors.incrementAndGet();
                 return "000 ERR key/value exceeds 999 charcaters";
             }
-            
+            switch (op) {
+                case "P": // PUT operations
+                    totalPuts.incrementAndGet();
+                    if (tupleSpace.containsKey(key)) {
+                        totalErrors.incrementAndGet();
+                        return String.format("ERR %s already exists", key);
+                    }
+                    tupleSpace.put(key, value);
+                    return String.format(format:"OK (%s, %s) added", key, value);
+
+                case "G": //GET operations
+                    totalGets.incrementAndGet();
+                    String removedValue = tupleSpace.remove(key);
+                    if (removedValue != null) {
+                        return String.format(format:"OK (%s, %s) removed", key, removedValue);
+                    } else {
+                        totalErrors.incrementAndGet();
+                        return String.format("ERR %s does not exist", key);
+                    }
+
+                case "R": //READ operations 
+                    totalReads.incrementAndGet();
+                    String currentValue = tupleSpace.get(key);
+                    if (currentValue != null) {
+                        return String.format("OK (%s, %s) read", key, currentValue);
+                    } else {
+                        totalErrors.incrementAndGet();
+                        return String.format(format:"ERR %s does not exist", key);
+                    }
+                    
+                default:
+                    totalErrors.incrementAndGet();
+                    return "000 ERR unknown operation";
+            }
+        }
+    }
+}
+                    
+                    
+                        
 
     
     
