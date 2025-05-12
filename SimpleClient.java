@@ -1,25 +1,37 @@
 import java.io.*;
 import java.net.*;
 
-public class SimpleClient {
-  public static void main(String[] args) throws IOExceptions {
-    Socket socket = new Socket ("localhost", 51234);
-    System.out.println("Connected to server.");
+public class TupleSpaceClient {
+    public static void main(String[] args) {
+        if (args.length != 3) {
+            System.err.println(x:"Usage: java TupleSpaceClient <host> <port> <request-file>");
+            return;
+        }
 
-    try (
-      BufferedReader in = new BufferedReader(
-        new inputStreamReader(socket.getOutputStream(), true);
-      PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-      BufferedReader console = new BufferedReader(
-        new InputStreamReader(System.in)
-      )
-    ){
-      String userInput;
-      while ((userInput = console.readLine()) != null) {
-        out.println(userInput); // Send a message to the server
-        String response = in.readLine(); // Receive server response
-        System.out.println("Server:" + response);
-      }
-    }
-  }
-}
+        String host = args[0];
+        int port = Integer.parseInt(args[1])；
+        String requestFile = args[2];
+
+        try (
+            Socket socket = new Socket(host, port);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            BufferedReader fileReader = new BufferedReader(new FileReader(requestFile))
+        ) {
+            String line;
+            while ((line = fileReader.readLine()) != null) {
+                String[] parts = line.split(regex:" ", limit:3);
+                if (parts.length < 2) {
+                    system.err.println("Invalid request: " + line);
+                    continue;
+                }
+
+                String op = parts[0].toUpperCase();
+                String key = parts[1];
+                String value = (parts.length > 2) ? parts[2] : "";
+
+                //
+
+
+                
+  
